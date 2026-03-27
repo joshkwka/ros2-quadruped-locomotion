@@ -1,0 +1,24 @@
+{
+    "name": "ROS 2 Jazzy Quadruped",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "runArgs": [
+        "--net=host",
+        "--gpus", "all",
+        "-e", "DISPLAY=${env:DISPLAY}",
+        "-e", "NVIDIA_DRIVER_CAPABILITIES=all",
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+        "--device=/dev/dri"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-iot.vscode-ros",
+                "ms-vscode.cpptools",
+                "ms-python.python"
+            ]
+        }
+    },
+    "remoteUser": "root"
+}
