@@ -24,28 +24,28 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# 1. Find the Eigen3 package
+# Find the Eigen3 package
 find_package(Eigen3 REQUIRED)
 
-# 2. Add the include directories so your .cpp files can find <Eigen/Dense>
+# Add the include directories so .cpp files can find <Eigen/Dense>
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
 )
 
-# 3. Create your node (we'll call the file ik_node.cpp for now)
-add_executable(ik_node 
-  src/ik_node.cpp 
-  src/ik_solver.cpp
-)
+# Create the ROS 2 Node
+add_executable(ik_node src/ik_node.cpp src/ik_solver.cpp)
 ament_target_dependencies(ik_node rclcpp std_msgs geometry_msgs sensor_msgs)
-
-# 4. Specifically link Eigen to your executable
 target_link_libraries(ik_node Eigen3::Eigen)
 
-# 5. Install the executable so 'ros2 run' can find it
+# Standalone test executable
+add_executable(ik_test src/ik_test.cpp src/ik_solver.cpp)
+target_link_libraries(ik_test Eigen3::Eigen)
+
+# Install the executables
 install(TARGETS
   ik_node
+  ik_test
   DESTINATION lib/${PROJECT_NAME}
 )
 
