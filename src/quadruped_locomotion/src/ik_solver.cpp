@@ -48,7 +48,7 @@ Eigen::Vector3d IKSolver::solveLegIK(const Eigen::Vector3d& target_xyz, bool is_
     double beta = std::acos(cos_thigh_offset);
 
     // Pitch the thigh forward to meet the target
-    double theta_thigh = alpha - beta;
+    double theta_thigh = alpha + beta;
 
     return Eigen::Vector3d(theta_hip, theta_thigh, theta_calf);
 }

@@ -32,14 +32,14 @@
     <color rgba="1.0 1.0 1.0 1.0"/>
   </material>
   <!-- ros_control plugin -->
-  <gazebo>
+  <!-- <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
       <robotNamespace>/go1_gazebo</robotNamespace>
       <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
     </plugin>
-  </gazebo>
+  </gazebo> -->
   <!-- Show the trajectory of trunk center. -->
-  <gazebo>
+  <!-- <gazebo>
     <plugin filename="libLinkPlot3DPlugin.so" name="3dplot">
       <frequency>10</frequency>
       <plot>
@@ -48,7 +48,7 @@
         <material>Gazebo/Yellow</material>
       </plot>
     </plugin>
-  </gazebo>
+  </gazebo> -->
   <!-- Show the trajectory of foot. You can add another trajectory about another foot. -->
   <!-- <gazebo>
         <plugin name="3dplot" filename="libLinkPlot3DPlugin.so">
@@ -60,13 +60,13 @@
             </plot>
         </plugin>
     </gazebo> -->
-  <gazebo>
+  <!-- <gazebo>
     <plugin filename="libgazebo_ros_force.so" name="gazebo_ros_force">
       <bodyName>trunk</bodyName>
       <topicName>/apply_force/trunk</topicName>
     </plugin>
-  </gazebo>
-  <gazebo reference="imu_link">
+  </gazebo> -->
+  <!-- <gazebo reference="imu_link">
     <gravity>true</gravity>
     <sensor name="imu_sensor" type="imu">
       <always_on>true</always_on>
@@ -84,7 +84,7 @@
       </plugin>
       <pose>0 0 0 0 0 0</pose>
     </sensor>
-  </gazebo>
+  </gazebo> -->
   <!-- Depth camera -->
   <!-- <gazebo>
         <plugin name="camera_plugin" filename="libgazebo_ros_openni_kinect.so">
@@ -171,7 +171,7 @@
           <far>3</far>
         </clip>
       </camera>
-      <plugin filename="libgazebo_ros_openni_kinect.so" name="camera_link_controller">
+      <!-- <plugin filename="libgazebo_ros_openni_kinect.so" name="camera_link_controller">
         <baseline>0.2</baseline>
         <alwaysOn>true</alwaysOn>
         <updateRate>1.0</updateRate>
@@ -194,11 +194,11 @@
         <Cy>0</Cy>
         <focalLength>0</focalLength>
         <hackBaseline>0</hackBaseline>
-      </plugin>
+      </plugin> -->
     </sensor>
   </gazebo>
   <!-- Foot contacts. -->
-  <gazebo reference="FR_calf">
+  <!-- <gazebo reference="FR_calf">
     <sensor name="FR_foot_contact" type="contact">
       <update_rate>100</update_rate>
       <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin"/>
@@ -233,9 +233,9 @@
         <collision>RL_calf_fixed_joint_lump__RL_foot_collision_1</collision>
       </contact>
     </sensor>
-  </gazebo>
+  </gazebo> -->
   <!-- Visualization of Foot contacts. -->
-  <gazebo reference="FR_foot">
+  <!-- <gazebo reference="FR_foot">
     <visual>
       <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
         <topicName>FR_foot_contact</topicName>
@@ -262,7 +262,7 @@
         <topicName>RL_foot_contact</topicName>
       </plugin>
     </visual>
-  </gazebo>
+  </gazebo> -->
   <gazebo reference="base">
     <material>Gazebo/Green</material>
     <turnGravityOff>false</turnGravityOff>
@@ -423,7 +423,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/trunk.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -481,7 +481,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/hip.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0"/>
@@ -534,7 +534,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/thigh_mirror.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -587,7 +587,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/calf.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -632,7 +632,7 @@
       <geometry>
         <sphere radius="0.01"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -694,7 +694,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/hip.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0"/>
@@ -747,7 +747,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/thigh.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -800,7 +800,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/calf.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -845,7 +845,7 @@
       <geometry>
         <sphere radius="0.01"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -907,7 +907,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/hip.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 -0.08 0"/>
@@ -960,7 +960,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/thigh_mirror.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -1013,7 +1013,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/calf.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -1058,7 +1058,7 @@
       <geometry>
         <sphere radius="0.01"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1120,7 +1120,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/hip.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="1.5707963267948966 0 0" xyz="0 0.08 0"/>
@@ -1173,7 +1173,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/thigh.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -1226,7 +1226,7 @@
       <geometry>
         <mesh filename="package://quadruped_description/meshes/calf.dae" scale="1 1 1"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 1.5707963267948966 0" xyz="0 0 -0.1065"/>
@@ -1271,7 +1271,7 @@
       <geometry>
         <sphere radius="0.01"/>
       </geometry>
-      <!-- <material name="orange"/> -->
+      <material name="orange"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -1773,5 +1773,116 @@
       <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
     </inertial>
   </link>
+  
+  <!-- Expose joints to ROS2 -->
+  <ros2_control name="Go1HardwareInterface" type="system">
+    <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+    </hardware>
+
+    <joint name="FR_hip_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="FR_thigh_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.8</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="FR_calf_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">-1.5</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+
+    <joint name="FL_hip_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="FL_thigh_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.8</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="FL_calf_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">-1.5</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+
+    <joint name="RR_hip_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="RR_thigh_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.8</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="RR_calf_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">-1.5</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+
+    <joint name="RL_hip_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.0</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="RL_thigh_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">0.8</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+    <joint name="RL_calf_joint">
+        <command_interface name="position"/>
+        <state_interface name="position"><param name="initial_value">-1.5</param></state_interface>
+        <state_interface name="velocity"/>
+        <param name="p">150.0</param>
+        <param name="d">3.0</param>
+    </joint>
+  </ros2_control>
+
+  <!-- Controller Manager plugin -->
+  <gazebo>
+    <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="libgz_ros2_control-system.so">
+      <parameters>$(find quadruped_control)/config/quadruped_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="trunk">
+    <visual>
+      <material>
+        <ambient>0.8 0.8 0.8 1.0</ambient>
+        <diffuse>0.8 0.8 0.8 1.0</diffuse>
+      </material>
+    </visual>
+  </gazebo>
 </robot>
 

@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -35,7 +36,7 @@ include_directories(
 
 # Create the ROS 2 Node
 add_executable(ik_node src/ik_node.cpp src/ik_solver.cpp)
-ament_target_dependencies(ik_node rclcpp std_msgs geometry_msgs sensor_msgs)
+ament_target_dependencies(ik_node rclcpp std_msgs geometry_msgs sensor_msgs trajectory_msgs)
 target_link_libraries(ik_node Eigen3::Eigen)
 
 # Standalone test executable
@@ -47,6 +48,11 @@ install(TARGETS
   ik_node
   ik_test
   DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 ament_package()
