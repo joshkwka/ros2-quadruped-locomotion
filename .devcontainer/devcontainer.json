@@ -7,8 +7,9 @@
         "--net=host",
         "--gpus", "all",
         "-e", "DISPLAY=${env:DISPLAY}",
+        "-e", "QT_X11_NO_MITSHM=1",
         "-e", "NVIDIA_DRIVER_CAPABILITIES=all",
-        "-v", "/tmp/.X11-unix:/tmp/.X11-unix",
+        "-v", "/tmp/.X11-unix:/tmp/.X11-unix:rw",
         "--device=/dev/dri"
     ],
     "customizations": {
@@ -16,8 +17,13 @@
             "extensions": [
                 "ms-iot.vscode-ros",
                 "ms-vscode.cpptools",
-                "ms-python.python"
-            ]
+                "ms-python.python",
+                "ms-vscode.cmake-tools",
+                "twxs.cmake"
+            ],
+            "settings": {
+                "ros.distro": "jazzy"
+            }
         }
     },
     "remoteUser": "root"
