@@ -12,6 +12,7 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -25,19 +26,21 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# Find the Eigen3 package
-find_package(Eigen3 REQUIRED)
-
 # Add the include directories so .cpp files can find <Eigen/Dense>
 include_directories(
   include
   ${EIGEN3_INCLUDE_DIRS}
 )
 
-# Create the ROS 2 Node
-add_executable(ik_node src/ik_node.cpp src/ik_solver.cpp)
-ament_target_dependencies(ik_node rclcpp std_msgs geometry_msgs sensor_msgs trajectory_msgs)
-target_link_libraries(ik_node Eigen3::Eigen)
+# Pushup Node
+add_executable(pushup_node src/pushup_node.cpp src/ik_solver.cpp)
+ament_target_dependencies(pushup_node rclcpp std_msgs geometry_msgs sensor_msgs trajectory_msgs)
+target_link_libraries(pushup_node Eigen3::Eigen)
+
+# Trot Node
+add_executable(trot_node src/trot_node.cpp src/ik_solver.cpp)
+ament_target_dependencies(trot_node rclcpp std_msgs geometry_msgs sensor_msgs trajectory_msgs)
+target_link_libraries(trot_node Eigen3::Eigen)
 
 # Standalone test executable
 add_executable(ik_test src/ik_test.cpp src/ik_solver.cpp)
@@ -45,7 +48,8 @@ target_link_libraries(ik_test Eigen3::Eigen)
 
 # Install the executables
 install(TARGETS
-  ik_node
+  pushup_node
+  trot_node
   ik_test
   DESTINATION lib/${PROJECT_NAME}
 )

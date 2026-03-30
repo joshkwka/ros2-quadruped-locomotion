@@ -9,6 +9,7 @@ This repository contains a ROS 2 (Jazzy) workspace for simulating and controllin
 * **Hardware Acceleration:** NVIDIA GPU Passthrough & X11 Display Forwarding
 
 ## Current Progress
+add video here
 ![Unitree Go1 standing](media/standing.png)
 ![Unitree Go1 sitting](media/squatting.png)
 
@@ -58,9 +59,9 @@ ros2 launch quadruped_control sim_launch.py
 ```
 
 ### 6. Run the "Push-Up" Script
-To test the inverse kinematics, run the ik_node executable to see the robot push up and squat down in a loop:
+To test the inverse kinematics, run the pushup_node launch file to see the robot push up and squat down in a loop:
 ```
-ros2 run quadruped_locomotion ik_node
+ros2 launch quadruped_locomotion pushup_launch.py
 ```
 NOTE: If this step fails, verify the controller state:
 ```
@@ -72,6 +73,13 @@ ros2 control set_controller_state joint_state_broadcaster active
 ros2 control set_controller_state leg_controller active
 ```
 
+### 7. Run the Locomotion Engine (Open-Loop Trot)
+To launch the continuous open-loop trot gait, terminate the pushup node, and run:
+```
+ros2 launch quadruped_locomotion trot_launch.py
+```
+NOTE: The robot is intended to hold a standing pose for 3 seconds prior to begin trotting.
+
 ## Current Packages
 - `quadruped_description`: Contains the URDF, 3D meshes, and physical parameters of the robot. Utilizes the open-source Go1 model provided by [Unitree Robotics](https://github.com/unitreerobotics/unitree_ros). (Completed)
 - `quadruped_locomotion`: The high-level "Brain" of the robot. This C++ package utilizes the **Eigen** library for high-performance linear algebra, handling gait scheduling, trajectory planning, and Inverse Kinematics (IK). It translates velocity commands into synchronized joint-space trajectories for all 12 degrees of freedom. (In-Progress)
@@ -81,3 +89,12 @@ ros2 control set_controller_state leg_controller active
 - **Bridging Analytical Math and Physical URDFs:** Standard C++ math libraries evaluate angles based on standard Cartesian quadrants (e.g., std::atan2 treating the positive axis as 0°). However, physical robot URDFs often define 0° as the joint pointing straight down toward gravity. I learned to successfully map textbook trigonometric equations (like the Law of Cosines) to actual motor deflection angles by applying geometric transformations and axis-sign flips to synchronize the software's coordinate frame with the hardware's zero-state.
 - **Coordinate Frame Decoupling:** To make the Inverse Kinematics (IK) modular and agnostic to the robot's body width, I separated the kinematics math into two distinct steps: generating high-level targets in the global "Trunk Frame" (center of mass), and translating those into a "Local Hip Frame" before executing the IK solver.
 - **Containerized Hardware Acceleration:** Configuring a reproducible DevContainer for robotics requires more than just installing dependencies. I learned how to successfully forward X11 display sockets (/tmp/.X11-unix) and configure NVIDIA GPU passthrough into a Docker container to enable real-time, hardware-accelerated GUI applications like RViz without polluting the host machine.
+- **Continuous Trajectory Generation & Phase Normalization:** Transitioning from discrete static poses to a fluid walking gait required mapping the continuous time domain into a normalized phase (0.0 to 1.0). This allowed me to decouple the diagonal leg pairs using a 180-degree phase offset.
+- **Center of Mass (CoM) Compensation:** The Go1 robot is back-heavy, causing the rear legs to sag and the body to pitch upwards during open-loop movement. This called for a closed-loop solution to actively balance the body.
+
+## Roadmap / Next Steps
+- [x] **URDF & Simulation Environment:** Stable ROS 2 / Gazebo bridging.
+- [x] **Inverse Kinematics:** 3D Cartesian space to Joint space mapping.
+- [x] **Open-Loop Locomotion:** Continuous Trot gait via trajectory generation.
+- [ ] **Closed-Loop Balancing:** Subscribe to IMU data (Roll/Pitch) and implement a dynamic PID controller to automatically adjust leg extensions and stabilize the chassis against disturbances. 
+- [ ] **Teleoperation:** Map standard `cmd_vel` Twist messages (from a keyboard or joystick) to dynamic stride length and heading changes.

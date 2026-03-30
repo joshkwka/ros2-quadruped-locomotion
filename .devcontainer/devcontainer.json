@@ -12,6 +12,10 @@
         "-v", "/tmp/.X11-unix:/tmp/.X11-unix:rw",
         "--device=/dev/dri"
     ],
+    "containerEnv": {
+        "NVIDIA_VISIBLE_DEVICES": "all",
+        "NVIDIA_DRIVER_CAPABILITIES": "all,display,graphics,utility"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
