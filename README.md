@@ -9,10 +9,10 @@ This repository contains a ROS 2 (Jazzy) workspace for simulating and controllin
 * **Hardware Acceleration:** NVIDIA GPU Passthrough & X11 Display Forwarding
 
 ## Open-Loop Trot
-put video here
+[trot.webm](https://github.com/user-attachments/assets/4c8a0fbd-31a8-4732-b567-6b4b5d4cf573)
 - This trot utilizes sinusoidal kinematics of the diagonal leg pairs, allowing for open-loop movement.
 ## Closed-Loop Trot
-put video here
+[balance.webm](https://github.com/user-attachments/assets/8bb13beb-baa3-4bdb-9683-d785d5d1198e)
 - This trot utilizes negative feedback loops using EMA filtered IMU data to implement pitch and roll PID controllers.
 - NOTE: The PID Controllers have plenty of room for improved tuning, and the system can be improved with a yaw controller for straight-line traversal.
 
