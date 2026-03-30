@@ -8,6 +8,7 @@
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory_point.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 
 #include <csignal>
 #include <thread>
@@ -29,11 +30,18 @@ public:
         imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>(
             "/imu", 10, std::bind(&BalanceNode::imu_callback, this, std::placeholders::_1));
 
+        // Subscribe to ROS 2 cmd_vel for teleoperation commands
+        cmd_vel_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
+            "/cmd_vel", 10, [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
+                target_vx_ = msg->linear.x;
+                target_wz_ = msg->angular.z;
+            });
+
         // 100Hz (10ms) control loop
         timer_ = this->create_wall_timer(
             10ms, std::bind(&BalanceNode::publish_trajectory, this));
             
-        RCLCPP_INFO(this->get_logger(), "Closed-Loop Balance Node initialized.");
+        RCLCPP_INFO(this->get_logger(), "Closed-Loop Balance & Teleop Node initialized.");
     }
 
     void publish_standing_pose() {
@@ -43,7 +51,6 @@ public:
         const double W = 0.10;
         
         Eigen::Vector3d pos_A(0.0, 0.0, -H_stand);
-        
         Eigen::Vector3d pos_FL(pos_A.x(), W, pos_A.z());
         Eigen::Vector3d pos_RR(pos_A.x(), -W, pos_A.z());
         Eigen::Vector3d pos_FR(pos_A.x(), -W, pos_A.z());
@@ -82,10 +89,15 @@ private:
     //////////////////////////////////////////////////////////////////////////////
     ///////                        Process IMU Data                        ///////
     //////////////////////////////////////////////////////////////////////////////
-
     double filtered_pitch_ = 0.0;
     double filtered_roll_  = 0.0;
     bool imu_initialized_ = false;
+
+    // Teleop state variables
+    double target_vx_ = 0.0;
+    double target_wz_ = 0.0;
+    double current_vx_ = 0.0;
+    double current_wz_ = 0.0;
 
     void imu_callback(const sensor_msgs::msg::Imu::SharedPtr msg) {
         // Extract quaternion
@@ -128,18 +140,16 @@ private:
     //////////////////////////////////////////////////////////////////////////////
 
     void publish_trajectory() {
-        
+
         //////////////////////////////////////////////////////////////////////////////
         ///////                     Define target positions                    ///////
         //////////////////////////////////////////////////////////////////////////////
-
+        
         auto current_time_obj = this->now();
         double current_time = current_time_obj.seconds();
 
         if (first_run_) {
-            if (current_time == 0.0) {
-                return;
-            } 
+            if (current_time == 0.0) return;
             start_time_ = current_time;
             last_time_  = current_time;
             first_run_ = false;
@@ -147,48 +157,60 @@ private:
         }
 
         double time_elapsed = current_time - start_time_;
+        double time_wait = 2.0;
 
-        // Trot trajectory parameters
-        const double L = 0.12;         // Step length (12 cm)
-        const double h = 0.05;         // Step height (5 cm)
-        const double H_stand = 0.28;   // Standing height (28 cm)
-        const double T = 1.0;          // Time for one full stride (1 second(s))
-        const double W = 0.10;         // Sprawl width (10 cm)
+        // Slew Rate Limiter for smooth acceleration
+        current_vx_ = 0.05 * target_vx_ + 0.95 * current_vx_;
+        current_wz_ = 0.05 * target_wz_ + 0.95 * current_wz_;
 
-        // Get robot to initially stand
-        Eigen::Vector3d pos_A(0.0, 0.0, -H_stand);
-        Eigen::Vector3d pos_B(0.0, 0.0, -H_stand);
+        /////////// Differential Steering ///////////
+        // Scale speed down
+        double linear_scale  = 0.2;  
+        double angular_scale = 0.15; // Scale down the rotation too so it doesn't spin wildly
+
+        double scaled_vx = current_vx_ * linear_scale;
+        double scaled_wz = current_wz_ * angular_scale;
+
+        // Calculate left and right step lengths
+        double L_left  = scaled_vx - scaled_wz;
+        double L_right = scaled_vx + scaled_wz;
+
+        // Cap speed at 0.15
+        L_left  = std::clamp(L_left, -0.20, 0.20);
+        L_right = std::clamp(L_right, -0.20, 0.20);
+
+        // Dynamic step height to stop marching if not moving
+        double speed_ratio = std::clamp(std::max(std::abs(current_vx_) / 0.1, std::abs(current_wz_) / 0.5), 0.0, 1.0);
+        double h_eff = 0.05 * speed_ratio; // Max height of 5cm
+
+        const double H_stand = 0.28;   
+        const double T = 1.0;          
+        const double W = 0.10;         
 
         double phase_A = 0.0;
         double phase_B = 0.0;
 
-        // Start walking after time_wait seconds of standing still
-        double time_wait = 2.0;
         if (time_elapsed > time_wait) {
             double walk_time = time_elapsed - time_wait;
-
-            // Offset left/right legs by 180 degeree (0.5 in phase)
-            // Phase [0.0 to 1.0) for both diagonal pairs
             phase_A = fmod(walk_time / T, 1.0);
             phase_B = fmod((walk_time / T) + 0.5, 1.0); 
-
-            // Lambda to calculate foot position based on its phase
-            auto get_foot_pos = [&](double phase) -> Eigen::Vector3d {
-                double x = (L / 2.0) * cos(2 * M_PI * phase);
-
-                double z = -H_stand;
-
-                // If in the first half of the phase, lift the foot (Swing Phase)
-                if (phase < 0.5) { 
-                    z += h * sin(2 * M_PI * phase); 
-                }
-                
-                return Eigen::Vector3d(x, 0.0, z); // Temporarily set Y to 0
-            };
-
-            pos_A = get_foot_pos(phase_A);
-            pos_B = get_foot_pos(phase_B);
         }
+
+        // Lambda to calculate foot position based on phase and dynamic Length/Height
+        auto get_foot_pos = [&](double phase, double L, double h) -> Eigen::Vector3d {
+            double x = (L / 2.0) * cos(2 * M_PI * phase);
+            double z = -H_stand;
+            if (phase < 0.5) { 
+                z += h * sin(2 * M_PI * phase); 
+            }
+            return Eigen::Vector3d(x, 0.0, z); 
+        };
+
+        // Create 4 distinct leg trajectories instead of 2 pairs
+        Eigen::Vector3d pos_FL_base = get_foot_pos(phase_A, L_left,  h_eff);
+        Eigen::Vector3d pos_RR_base = get_foot_pos(phase_A, L_right, h_eff);
+        Eigen::Vector3d pos_FR_base = get_foot_pos(phase_B, L_right, h_eff);
+        Eigen::Vector3d pos_RL_base = get_foot_pos(phase_B, L_left,  h_eff);
 
         //////////////////////////////////////////////////////////////////////////////
         ///////                       Pitch PID Correction                     ///////
@@ -267,15 +289,12 @@ private:
             return pos;
         };
 
-        // Pair A: Front Left (A) & Rear Right (A)
-        Eigen::Vector3d pos_FL = apply_balance(pos_A, front_z_offset + left_z_offset, phase_A);
-        Eigen::Vector3d pos_RR = apply_balance(pos_A, rear_z_offset  + right_z_offset, phase_A);
-        
-        // Pair B: Front Right (B) & Rear Left (B)
-        Eigen::Vector3d pos_FR = apply_balance(pos_B, front_z_offset + right_z_offset, phase_B);
-        Eigen::Vector3d pos_RL = apply_balance(pos_B, rear_z_offset  + left_z_offset, phase_B);
+        // Apply balance directly to the 4 distinct trajectories
+        Eigen::Vector3d pos_FL = apply_balance(pos_FL_base, front_z_offset + left_z_offset, phase_A);
+        Eigen::Vector3d pos_RR = apply_balance(pos_RR_base, rear_z_offset  + right_z_offset, phase_A);
+        Eigen::Vector3d pos_FR = apply_balance(pos_FR_base, front_z_offset + right_z_offset, phase_B);
+        Eigen::Vector3d pos_RL = apply_balance(pos_RL_base, rear_z_offset  + left_z_offset, phase_B);
 
-        // Adjust Sprawl Width (W)
         pos_FL.y() = W;   
         pos_RR.y() = -W;
         pos_FR.y() = -W;  
@@ -313,13 +332,11 @@ private:
         
         msg.points.push_back(point);
         publisher_->publish(msg);
-
-        // RCLCPP_INFO(this->get_logger(), "(Balanced) Trotting... Time Elapsed: %.2f seconds", time_elapsed);
-        RCLCPP_INFO(this->get_logger(), "Pitch: %.2f DEG Roll: %.2f DEG", current_pitch_*180/M_PI, current_roll_*180/M_PI);
     }
 
     rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imu_sub_;
+    rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_sub_;
     rclcpp::TimerBase::SharedPtr timer_;
     quadruped_locomotion::IKSolver solver_;
     
@@ -336,7 +353,6 @@ private:
     double integral_roll_error_;
 };
 
-// Global pointer for signal handler to access the node
 std::shared_ptr<BalanceNode> g_node = nullptr;
 
 void sigint_handler(int sig) {
@@ -349,13 +365,9 @@ void sigint_handler(int sig) {
 }
 
 int main(int argc, char * argv[]) {
-    // Initialize ROS 2 and disable default SIGINT handler
     rclcpp::init(argc, argv, rclcpp::InitOptions(), rclcpp::SignalHandlerOptions::None);
     g_node = std::make_shared<BalanceNode>();
-    // Register custom interceptor
     signal(SIGINT, sigint_handler);
-    
     rclcpp::spin(g_node);
-    
     return 0;
 }
