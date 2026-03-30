@@ -14,7 +14,7 @@ This repository contains a ROS 2 (Jazzy) workspace for simulating and controllin
 ## Closed-Loop Trot
 [balance.webm](https://github.com/user-attachments/assets/8bb13beb-baa3-4bdb-9683-d785d5d1198e)
 - This trot utilizes negative feedback loops using EMA filtered IMU data to implement pitch and roll PID controllers.
-- NOTE: The PID Controllers have plenty of room for improved tuning, and the system can be improved with a yaw controller for straight-line traversal.
+- NOTE: The PID Controllers have plenty of room for improved tuning for smoother movement, and the system can be improved with a yaw controller for straight-line traversal.
 
 ## Prerequisites
 To run this project exactly as intended without managing local dependencies, ensure you have the following installed on your host machine:
