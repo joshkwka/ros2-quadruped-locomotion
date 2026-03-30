@@ -149,11 +149,11 @@ private:
         double time_elapsed = current_time - start_time_;
 
         // Trot trajectory parameters
-        const double L = 0.12;         // Step length (12 cm)
-        const double h = 0.05;         // Step height (5 cm)
-        const double H_stand = 0.28;   // Standing height (28 cm)
-        const double T = 1.0;          // Time for one full stride (1 second(s))
-        const double W = 0.10;         // Sprawl width (10 cm)
+        const double L = 0.12;         // Step length (m)
+        const double h = 0.05;         // Step height (m)
+        const double H_stand = 0.28;   // Standing height (m)
+        const double T = 1.0;          // Time for one full stride (second(s))
+        const double W = 0.10;         // Sprawl width (cm)
 
         // Get robot to initially stand
         Eigen::Vector3d pos_A(0.0, 0.0, -H_stand);
