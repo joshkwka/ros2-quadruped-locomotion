@@ -9,7 +9,7 @@ This repository contains a ROS 2 (Jazzy) workspace for simulating and controllin
 * **Hardware Acceleration:** NVIDIA GPU Passthrough & X11 Display Forwarding
 
 ## Current Progress
-add video here
+![open-loop trot](https://github.com/joshkwka/ros2-quadruped-locomotion/blob/main/media/trot.webm)
 ![Unitree Go1 standing](media/standing.png)
 ![Unitree Go1 sitting](media/squatting.png)
 
