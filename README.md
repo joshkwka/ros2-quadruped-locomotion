@@ -8,7 +8,7 @@ This repository contains a ROS 2 (Jazzy) workspace for simulating and controllin
 * **Physics Engine:** Gazebo
 * **Hardware Acceleration:** NVIDIA GPU Passthrough & X11 Display Forwarding
 
-## Current Progress
+## Open-Loop Trot
 [![open-loop trot](https://github.com/joshkwka/ros2-quadruped-locomotion/blob/main/media/trot.mp4)](https://github.com/user-attachments/assets/366ab839-9d10-47fb-8a5a-fce8c704a61d)
 
 ## Prerequisites
@@ -76,7 +76,7 @@ To launch the continuous open-loop trot gait, terminate the pushup node, and run
 ```
 ros2 launch quadruped_locomotion trot_launch.py
 ```
-NOTE: The robot is intended to hold a standing pose for 3 seconds prior to begin trotting.
+NOTE: The robot is intended to hold a standing pose for 2 seconds prior to begin trotting.
 
 ## Current Packages
 - `quadruped_description`: Contains the URDF, 3D meshes, and physical parameters of the robot. Utilizes the open-source Go1 model provided by [Unitree Robotics](https://github.com/unitreerobotics/unitree_ros). (Completed)

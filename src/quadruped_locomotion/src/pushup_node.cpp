@@ -13,6 +13,7 @@ using namespace std::chrono_literals;
 class PushupNode : public rclcpp::Node {
 public:
     PushupNode() : Node("pushup_node"), is_standing_(true) {
+        // Publish joint trajectories to the leg controller
         publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
             "/leg_controller/joint_trajectory", 10);
 

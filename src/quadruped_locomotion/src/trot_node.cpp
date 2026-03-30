@@ -13,6 +13,7 @@ using namespace std::chrono_literals;
 class TrotNode : public rclcpp::Node {
 public:
     TrotNode() : Node("trot_node"), first_run_(true) {
+        // Publish joint trajectories to the leg controller
         publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>(
             "/leg_controller/joint_trajectory", 10);
 
@@ -47,11 +48,11 @@ private:
 
         // Trot trajectory parameters
         const double L = 0.10;         // Step length (10 cm)
-        const double h = 0.04;         // Step height (6 cm)
+        const double h = 0.08;         // Step height (8 cm)
         const double H_stand = 0.28;   // Standing height (28 cm)
-        const double T = 1.0;          // Time for one full stride (2 second(s))
+        const double T = 1.0;          // Time for one full stride (1 second(s))
         const double W = 0.10;         // Sprawl width (10 cm)
-        double balance_offset = 0.0;   // Offset to balance the robot 
+        // double balance_offset = 0.0;   // Offset to balance the robot 
 
         // Get robot to initially stand
         Eigen::Vector3d pos_A(0.0, 0.0, -H_stand);
@@ -84,18 +85,20 @@ private:
             pos_A = get_foot_pos(phase_A);
             pos_B = get_foot_pos(phase_B);
 
-            balance_offset = -0.02;  // Offset to balance the robot 
+            // balance_offset = -0.02;  // Offset to balance the robot 
 
         }
 
         // Set Y positions for the legs based on the sprawl width (W)
         // Pair A: Front Left & Rear Right
         Eigen::Vector3d pos_FL(pos_A.x(), W, pos_A.z());
-        Eigen::Vector3d pos_RR(pos_A.x(), -W, pos_A.z()+balance_offset);
+        Eigen::Vector3d pos_RR(pos_A.x(), -W, pos_A.z());
+        // Eigen::Vector3d pos_RR(pos_A.x(), -W, pos_A.z() + balance_offset);
 
         // Pair B: Front Right & Rear Left
         Eigen::Vector3d pos_FR(pos_B.x(), -W, pos_B.z());
-        Eigen::Vector3d pos_RL(pos_B.x(), W, pos_B.z()+balance_offset);        
+        Eigen::Vector3d pos_RL(pos_B.x(), W, pos_B.z());
+        // Eigen::Vector3d pos_RL(pos_B.x(), W, pos_B.z() + balance_offset);
 
         //////////////////////////////////////////////////////////////////////////////
 

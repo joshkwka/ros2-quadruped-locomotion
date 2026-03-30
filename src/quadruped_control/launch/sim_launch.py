@@ -86,9 +86,18 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Bridge IMU to ROS 2
+    imu_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/imu@sensor_msgs/msg/Imu[gz.msgs.IMU'],
+        output='screen'
+    )
+
     return LaunchDescription([
         set_resource_path,
         clock_bridge,
+        imu_bridge,
         node_robot_state_publisher,
         gazebo,
         spawn_entity,

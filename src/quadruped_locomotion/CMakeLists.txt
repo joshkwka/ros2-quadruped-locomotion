@@ -42,6 +42,17 @@ add_executable(trot_node src/trot_node.cpp src/ik_solver.cpp)
 ament_target_dependencies(trot_node rclcpp std_msgs geometry_msgs sensor_msgs trajectory_msgs)
 target_link_libraries(trot_node Eigen3::Eigen)
 
+# Closed-Loop Balance Node
+add_executable(balance_node src/balance_node.cpp src/ik_solver.cpp)
+ament_target_dependencies(balance_node 
+  rclcpp 
+  std_msgs 
+  geometry_msgs 
+  sensor_msgs 
+  trajectory_msgs
+)
+target_link_libraries(balance_node Eigen3::Eigen)
+
 # Standalone test executable
 add_executable(ik_test src/ik_test.cpp src/ik_solver.cpp)
 target_link_libraries(ik_test Eigen3::Eigen)
@@ -50,6 +61,7 @@ target_link_libraries(ik_test Eigen3::Eigen)
 install(TARGETS
   pushup_node
   trot_node
+  balance_node
   ik_test
   DESTINATION lib/${PROJECT_NAME}
 )
